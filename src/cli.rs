@@ -21,7 +21,7 @@ pub struct AddArgs {
     pub command: String,
 
     /// Brief description of regret
-    pub description: String,
+    pub reason: String,
 }
 
 #[derive(Args)]
