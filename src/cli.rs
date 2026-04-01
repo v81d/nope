@@ -20,7 +20,7 @@ pub struct AddArgs {
     /// Command to add to regrets list
     pub command: String,
 
-    /// Brief description of regret
+    /// Brief reason for regret
     pub reason: String,
 }
 
