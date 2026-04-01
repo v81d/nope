@@ -3,18 +3,30 @@ use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
-use std::time::SystemTime;
+use tabled::Tabled;
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Config {
+struct Config {
     pub regrets: Vec<Regret>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Tabled, Serialize, Deserialize, Debug)]
 pub struct Regret {
     pub command: String,
     pub reason: String,
-    pub timestamp: SystemTime,
+    pub timestamp: Timestamp,
+}
+
+/* Since std::time::SystemTime does not implement std::fmt::Display, create a new struct that
+ * uses SystemTime as a field and implement display for that struct instead.
+ */
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Timestamp(pub std::time::SystemTime);
+
+impl std::fmt::Display for Timestamp {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", humantime::format_rfc3339_seconds(self.0))
+    }
 }
 
 fn config_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
@@ -34,6 +46,29 @@ fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     }
 
     Ok(config_path)
+}
+
+pub fn list_regrets() -> Result<Vec<Regret>, Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+
+    let config: Config = if data.trim().is_empty() {
+        Config {
+            regrets: Vec::new(),
+        }
+    } else {
+        toml::from_str(&data).unwrap()
+    };
+
+    Ok(config.regrets)
 }
 
 pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
