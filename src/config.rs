@@ -30,7 +30,7 @@ fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
 
     // Create all if the parent config directory is not present
     if let Some(parent) = config_path.parent() {
-        std::fs::create_dir_all(parent)?;
+        std::fs::create_dir_all(parent).unwrap();
     }
 
     Ok(config_path)
@@ -42,17 +42,18 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
         .write(true)
         .create(true)
         .truncate(false)
-        .open(&get_config_path()?)?;
+        .open(get_config_path().unwrap())
+        .unwrap();
 
     let mut data = String::new();
-    file.read_to_string(&mut data)?; // data as string
+    file.read_to_string(&mut data).unwrap(); // data as string
 
     let mut config: Config = if data.trim().is_empty() {
         Config {
             regrets: Vec::new(),
         }
     } else {
-        toml::from_str(&data)? // config as Vec<Regret>
+        toml::from_str(&data).unwrap() // config as Vec<Regret>
     };
 
     // If any regret in config has the same command as the one to be added, return an error
@@ -62,9 +63,40 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
 
     config.regrets.push(regret);
 
-    file.seek(SeekFrom::Start(0))?; // move cursor to start
-    file.set_len(0)?; // truncate/clear
-    file.write_all(toml::to_string(&config)?.as_bytes())?;
+    file.seek(SeekFrom::Start(0)).unwrap(); // cursor to start
+    file.set_len(0).unwrap(); // truncate/clear
+    file.write_all(toml::to_string(&config).unwrap().as_bytes())
+        .unwrap();
+
+    Ok(())
+}
+
+pub fn remove_regret(command: &str) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+
+    let mut config: Config = if data.trim().is_empty() {
+        Config {
+            regrets: Vec::new(),
+        }
+    } else {
+        toml::from_str(&data).unwrap()
+    };
+
+    config.regrets.retain(|r| r.command != command); // retain non-matching commands
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+    file.set_len(0).unwrap();
+    file.write_all(toml::to_string(&config).unwrap().as_bytes())
+        .unwrap();
 
     Ok(())
 }
