@@ -3,7 +3,7 @@ mod config;
 
 use clap::Parser;
 use cli::{Cli, Commands};
-use config::{Regret, add_regret};
+use config::{Regret, add_regret, remove_regret};
 use std::time::SystemTime;
 
 fn main() {
@@ -18,6 +18,9 @@ fn main() {
             };
 
             add_regret(regret).unwrap();
+        }
+        Commands::Remove(args) => {
+            remove_regret(&args.command).unwrap();
         }
         _ => (),
     }
