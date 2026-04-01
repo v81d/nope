@@ -3,13 +3,22 @@ mod config;
 
 use clap::Parser;
 use cli::{Cli, Commands};
+use config::{Regret, add_regret};
+use std::time::SystemTime;
 
 fn main() {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::List => println!("List something."),
-        Commands::Add(args) => println!("{} - {}", args.command, args.description),
+        Commands::Add(args) => {
+            let regret = Regret {
+                command: args.command,
+                reason: args.reason,
+                timestamp: SystemTime::now(),
+            };
+
+            add_regret(regret).unwrap();
+        }
         _ => (),
     }
 }
