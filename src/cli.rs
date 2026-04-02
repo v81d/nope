@@ -20,6 +20,8 @@ pub enum Commands {
     Remove(RemoveArgs),
     /// Check a command against existing regrets
     Check(CheckArgs),
+    /// Clear regrets list
+    Clear,
 }
 
 #[derive(Args)]

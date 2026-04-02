@@ -13,6 +13,8 @@ use std::io::{self, Write};
 use std::time::SystemTime;
 use tabled::{Table, Tabled, settings::Style};
 
+use crate::config::clear_regrets;
+
 #[derive(Tabled)]
 struct RegretListRow {
     #[tabled(rename = "ID")]
@@ -28,13 +30,14 @@ struct RegretListRow {
 fn main() {
     let cli = Cli::parse();
 
+    let all_regrets = list_regrets().unwrap();
+
     match cli.command {
         Commands::Init(args) => {
             initialize_shell(&args.shell);
         }
         Commands::List => {
-            let regrets = list_regrets()
-                .unwrap()
+            let regrets = all_regrets
                 .into_iter()
                 .enumerate()
                 .map(|(i, r)| RegretListRow {
@@ -55,7 +58,7 @@ fn main() {
                 reason: Reason(args.reason),
                 timestamp: Timestamp(SystemTime::now()),
             };
-            let id: usize = list_regrets().unwrap().len();
+            let id: usize = all_regrets.len();
 
             // Regret details
             println!("{}", format!("Regret {}:", id).bold().cyan());
@@ -95,7 +98,7 @@ fn main() {
             );
 
             // Prompt
-            print!("Are you sure you want to remove this entry? [Y/n] ");
+            print!("Are you sure you want to remove this regret? [Y/n] ");
             io::stdout().flush().unwrap();
 
             let mut input = String::new();
@@ -113,6 +116,28 @@ fn main() {
                 eprintln!("{}", "This command is in your regret list.".bold().red());
                 eprintln!("{} {}", "Reason:".red(), regret.reason.get().yellow());
                 std::process::exit(1);
+            }
+        }
+        Commands::Clear => {
+            // Prompt
+            println!(
+                "{}",
+                "WARNING: This is a highly destructive action!".bold().red()
+            );
+            print!(
+                "Are you sure you want to clear {} regrets? [y/N] ",
+                all_regrets.len()
+            );
+            io::stdout().flush().unwrap();
+
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read user input.");
+
+            if input.trim().eq_ignore_ascii_case("y") {
+                clear_regrets().unwrap();
+                println!("The regrets list has been cleared.")
             }
         }
     }
