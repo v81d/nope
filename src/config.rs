@@ -151,6 +151,27 @@ pub fn remove_regret(id: usize) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
+pub fn clear_regrets() -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let config = Config {
+        regrets: Vec::new(),
+    };
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+    file.set_len(0).unwrap();
+    file.write_all(toml::to_string(&config).unwrap().as_bytes())
+        .unwrap();
+
+    Ok(())
+}
+
 pub fn get_regret(id: usize) -> Result<Regret, Box<dyn std::error::Error>> {
     let mut file = OpenOptions::new()
         .read(true)
