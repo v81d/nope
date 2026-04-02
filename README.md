@@ -100,7 +100,24 @@ To remove an existing regret, type `nope remove <COMMAND>` with the command in y
 
 ### Listing Regrets
 
-To list your existing regrets, type `nope list` in your terminal. You should see a table displaying the command, reason, and timestamp of each regret.
+To list your existing regrets, type `nope list` in your terminal.
+
+You should see a table displaying the command, reason, and timestamp of each regret.
+
+### Checking a Command
+
+To check a command against your regrets list, type `nope check <COMMAND>` with the command in your terminal.
+
+If you see an output, the command is in your regrets list. Otherwise, the command is not in your list.
+
+### Clearing All Regrets
+
+> [!CAUTION]
+> This is a highly destructive action.
+
+To clear ALL regrets from your entire regrets list, type `nope clear` in your terminal.
+
+This will reset your entire configuration and remove every single regret you ever added.
 
 ## Contributing
 
