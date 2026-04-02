@@ -33,6 +33,52 @@ The following guide provides instructions on how to build and run nope.
 
 You must have Rust and Cargo installed. If you don't already have them, you can do so by following the [official install guide](https://rust-lang.org/tools/install).
 
+### Nix Flake
+
+You can install nope using the official Nix flake. You can either do this declaratively (recommended for NixOS / Home Manager users) or imperatively.
+
+#### Declarative/Flake Installation (Recommended for NixOS / Home Manager Users)
+
+To install nope declaratively using Nix flakes, follow the steps:
+
+1. Add the repository to your Nix configuration flake inputs:
+
+```nix
+inputs = {
+  # ...
+  nope.url = "github:v81d/nope";
+  # ...
+};
+```
+
+2. Add nope to package list:
+
+```nix
+# System-wide packages (configuration.nix)
+environment.systemPackages = [
+  # ...
+  inputs.nope.packages.${pkgs.stdenv.hostPlatform.system}.nope
+  # ...
+];
+
+# Home Manager
+home.packages = [
+  # ...
+  inputs.nope.packages.${pkgs.stdenv.hostPlatform.system}.nope
+  # ...
+]
+```
+
+#### Imperative Installation
+
+To install nope imperatively, simply run the command:
+
+```nix
+nix profile install github:v81d/nope#nope
+```
+
+This will install all dependencies for the package and nope itself. After installation, you should be good to go.
+
 ### Build Manually
 
 After installing the requirements, you can build the project. To do so, follow the steps:
