@@ -1,6 +1,6 @@
 pub fn initialize_shell(shell: &str) {
     let exe = std::env::current_exe()
-        .expect("Failed to get current executable path")
+        .expect("Failed to get current executable path.")
         .to_string_lossy()
         .to_string();
 
