@@ -9,7 +9,6 @@ use cli::{Cli, Commands};
 use colored::Colorize;
 use config::{Regret, Timestamp, add_regret, list_regrets, remove_regret};
 use init::initialize_shell;
-use std::io::Write;
 use std::time::SystemTime;
 use tabled::{Table, settings::Style};
 
@@ -42,20 +41,8 @@ fn main() {
         }
         Commands::Check(args) => {
             if let Some(regret) = check_command(&args.command) {
-                let mut tty = std::fs::OpenOptions::new()
-                    .write(true)
-                    .open("/dev/tty")
-                    .unwrap();
-
-                writeln!(
-                    tty,
-                    "{}",
-                    "This command is in your regret list.".bold().red()
-                )
-                .unwrap();
-                writeln!(tty, "{} {}", "Reason:".red(), regret.reason.yellow()).unwrap();
-                tty.flush().unwrap();
-
+                eprintln!("{}", "This command is in your regret list.".bold().red());
+                eprintln!("{} {}", "Reason:".red(), regret.reason.yellow());
                 std::process::exit(1);
             }
         }
