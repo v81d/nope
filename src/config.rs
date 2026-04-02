@@ -150,3 +150,26 @@ pub fn remove_regret(id: usize) -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
+
+pub fn get_regret(id: usize) -> Result<Regret, Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+
+    let config: Config = if data.trim().is_empty() {
+        Config {
+            regrets: Vec::new(),
+        }
+    } else {
+        toml::from_str(&data).unwrap()
+    };
+
+    Ok(config.regrets[id].clone())
+}

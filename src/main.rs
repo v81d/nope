@@ -7,8 +7,9 @@ use checker::check_command;
 use clap::Parser;
 use cli::{Cli, Commands};
 use colored::Colorize;
-use config::{Reason, Regret, Timestamp, add_regret, list_regrets, remove_regret};
+use config::{Reason, Regret, Timestamp, add_regret, get_regret, list_regrets, remove_regret};
 use init::initialize_shell;
+use std::io::{self, Write};
 use std::time::SystemTime;
 use tabled::{Table, Tabled, settings::Style};
 
@@ -54,11 +55,58 @@ fn main() {
                 reason: Reason(args.reason),
                 timestamp: Timestamp(SystemTime::now()),
             };
+            let id: usize = list_regrets().unwrap().len();
 
-            add_regret(regret).unwrap();
+            // Regret details
+            println!("{}", format!("Regret {}:", id).bold().cyan());
+            println!("{} {}", "Command:".cyan(), regret.command.yellow());
+            println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
+            println!(
+                "{} {}",
+                "Timestamp:".cyan(),
+                regret.timestamp.to_string().yellow()
+            );
+
+            // Prompt
+            print!("Would you like to add this regret? [Y/n] ");
+            io::stdout().flush().unwrap(); // force-write buffered output
+
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read user input.");
+
+            if input.trim().eq_ignore_ascii_case("y") || input.trim().is_empty() {
+                add_regret(regret).unwrap();
+                println!("The regret has been added.")
+            }
         }
         Commands::Remove(args) => {
-            remove_regret(args.id).unwrap();
+            let regret: Regret = get_regret(args.id).unwrap();
+
+            // Regret details
+            println!("{}", format!("Regret {}:", args.id).bold().cyan());
+            println!("{} {}", "Command:".cyan(), regret.command.yellow());
+            println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
+            println!(
+                "{} {}",
+                "Timestamp:".cyan(),
+                regret.timestamp.to_string().yellow()
+            );
+
+            // Prompt
+            print!("Are you sure you want to remove this entry? [Y/n] ");
+            io::stdout().flush().unwrap();
+
+            let mut input = String::new();
+            io::stdin()
+                .read_line(&mut input)
+                .expect("Failed to read user input.");
+
+            if input.trim().eq_ignore_ascii_case("y") || input.trim().is_empty() {
+                remove_regret(args.id).unwrap();
+                println!("The regret has been removed.")
+            }
         }
         Commands::Check(args) => {
             if let Some(regret) = check_command(&args.command) {
