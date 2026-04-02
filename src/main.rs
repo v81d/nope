@@ -37,7 +37,7 @@ fn main() {
             add_regret(regret).unwrap();
         }
         Commands::Remove(args) => {
-            remove_regret(&args.command).unwrap();
+            remove_regret(args.command_id).unwrap();
         }
         Commands::Check(args) => {
             if let Some(regret) = check_command(&args.command) {

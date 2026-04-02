@@ -38,8 +38,8 @@ pub struct AddArgs {
 
 #[derive(Args)]
 pub struct RemoveArgs {
-    /// Command to remove from regrets list
-    pub command: String,
+    /// Command ID to remove from regrets list
+    pub command_id: usize,
 }
 
 #[derive(Args)]
