@@ -1,6 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 
-///  A CLI tool for keeping track of commands you regret running.
+/// A CLI tool for keeping track of commands you regret running
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
@@ -10,10 +10,19 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Initialize the program for the specified shell
     Init(InitArgs),
+
+    /// List existing regrets
     List,
+
+    /// Add a new regret
     Add(AddArgs),
+
+    /// Remove an existing regret
     Remove(RemoveArgs),
+
+    /// Check a command against existing regrets
     Check(CheckArgs),
 }
 
