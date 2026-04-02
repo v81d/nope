@@ -10,11 +10,10 @@ _nope_check() {
     if ! "__EXE__" check "$cmd"; then
         local response
 
-        echo "Due to ZSH scripting limitations, the entire shell will be restarted if you cancel. To avoid this, use ^C instead."
         read "response?Run anyway? [y/N] " </dev/tty
 
         if [[ ! "$response" =~ ^[Yy]$ ]]; then
-            exec zsh
+            kill -INT -$$
         fi
     fi
 }
