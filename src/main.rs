@@ -125,8 +125,13 @@ fn main() {
                 "WARNING: This is a highly destructive action!".bold().red()
             );
             print!(
-                "Are you sure you want to clear {} regrets? [y/N] ",
-                all_regrets.len()
+                "Are you sure you want to clear {} {}? [y/N] ",
+                all_regrets.len(),
+                if all_regrets.len() == 1 {
+                    "regret"
+                } else {
+                    "regrets"
+                }
             );
             io::stdout().flush().unwrap();
 
