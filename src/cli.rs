@@ -10,9 +10,17 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    Init(InitArgs),
     List,
     Add(AddArgs),
     Remove(RemoveArgs),
+    Check(CheckArgs),
+}
+
+#[derive(Args)]
+pub struct InitArgs {
+    /// The shell to initialize
+    pub shell: String,
 }
 
 #[derive(Args)]
@@ -27,5 +35,11 @@ pub struct AddArgs {
 #[derive(Args)]
 pub struct RemoveArgs {
     /// Command to remove from regrets list
+    pub command: String,
+}
+
+#[derive(Args)]
+pub struct CheckArgs {
+    /// Command to check against regrets list
     pub command: String,
 }
