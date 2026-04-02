@@ -122,7 +122,7 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn remove_regret(command: &str) -> Result<(), Box<dyn std::error::Error>> {
+pub fn remove_regret(command_id: usize) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -142,7 +142,7 @@ pub fn remove_regret(command: &str) -> Result<(), Box<dyn std::error::Error>> {
         toml::from_str(&data).unwrap()
     };
 
-    config.regrets.retain(|r| r.command != command); // retain non-matching commands
+    config.regrets.remove(command_id); // remove at index
 
     file.seek(SeekFrom::Start(0)).unwrap();
     file.set_len(0).unwrap();
