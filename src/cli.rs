@@ -12,16 +12,12 @@ pub struct Cli {
 pub enum Commands {
     /// Initialize the program for the specified shell
     Init(InitArgs),
-
     /// List existing regrets
     List,
-
     /// Add a new regret
     Add(AddArgs),
-
     /// Remove an existing regret
     Remove(RemoveArgs),
-
     /// Check a command against existing regrets
     Check(CheckArgs),
 }
@@ -36,9 +32,8 @@ pub struct InitArgs {
 pub struct AddArgs {
     /// Command to add to regrets list
     pub command: String,
-
     /// Brief reason for regret
-    pub reason: String,
+    pub reason: Option<String>,
 }
 
 #[derive(Args)]

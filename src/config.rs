@@ -13,8 +13,24 @@ pub struct Config {
 #[derive(Tabled, Serialize, Deserialize, Debug, Clone)]
 pub struct Regret {
     pub command: String,
-    pub reason: String,
+    #[serde(default)]
+    pub reason: Reason,
     pub timestamp: Timestamp,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct Reason(pub Option<String>);
+
+impl Reason {
+    pub fn get(&self) -> String {
+        self.0.clone().unwrap_or_default()
+    }
+}
+
+impl std::fmt::Display for Reason {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", &self.get())
+    }
 }
 
 /* Since std::time::SystemTime does not implement std::fmt::Display, create a new struct that

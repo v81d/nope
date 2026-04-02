@@ -7,7 +7,7 @@ use checker::check_command;
 use clap::Parser;
 use cli::{Cli, Commands};
 use colored::Colorize;
-use config::{Regret, Timestamp, add_regret, list_regrets, remove_regret};
+use config::{Reason, Regret, Timestamp, add_regret, list_regrets, remove_regret};
 use init::initialize_shell;
 use std::time::SystemTime;
 use tabled::{Table, settings::Style};
@@ -30,7 +30,7 @@ fn main() {
         Commands::Add(args) => {
             let regret = Regret {
                 command: args.command,
-                reason: args.reason,
+                reason: Reason(args.reason),
                 timestamp: Timestamp(SystemTime::now()),
             };
 
@@ -42,7 +42,7 @@ fn main() {
         Commands::Check(args) => {
             if let Some(regret) = check_command(&args.command) {
                 eprintln!("{}", "This command is in your regret list.".bold().red());
-                eprintln!("{} {}", "Reason:".red(), regret.reason.yellow());
+                eprintln!("{} {}", "Reason:".red(), regret.reason.get().yellow());
                 std::process::exit(1);
             }
         }
