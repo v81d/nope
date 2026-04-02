@@ -3,14 +3,13 @@ use serde::{Deserialize, Serialize};
 use std::fs::OpenOptions;
 use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
-use tabled::Tabled;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
     pub regrets: Vec<Regret>,
 }
 
-#[derive(Tabled, Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Regret {
     pub command: String,
     #[serde(default)]
@@ -122,7 +121,7 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
     Ok(())
 }
 
-pub fn remove_regret(command_id: usize) -> Result<(), Box<dyn std::error::Error>> {
+pub fn remove_regret(id: usize) -> Result<(), Box<dyn std::error::Error>> {
     let mut file = OpenOptions::new()
         .read(true)
         .write(true)
@@ -142,7 +141,7 @@ pub fn remove_regret(command_id: usize) -> Result<(), Box<dyn std::error::Error>
         toml::from_str(&data).unwrap()
     };
 
-    config.regrets.remove(command_id); // remove at index
+    config.regrets.remove(id); // remove at index
 
     file.seek(SeekFrom::Start(0)).unwrap();
     file.set_len(0).unwrap();
