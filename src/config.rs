@@ -6,11 +6,11 @@ use std::path::{Path, PathBuf};
 use tabled::Tabled;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Config {
+pub struct Config {
     pub regrets: Vec<Regret>,
 }
 
-#[derive(Tabled, Serialize, Deserialize, Debug)]
+#[derive(Tabled, Serialize, Deserialize, Debug, Clone)]
 pub struct Regret {
     pub command: String,
     pub reason: String,
@@ -20,7 +20,7 @@ pub struct Regret {
 /* Since std::time::SystemTime does not implement std::fmt::Display, create a new struct that
  * uses SystemTime as a field and implement display for that struct instead.
  */
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Timestamp(pub std::time::SystemTime);
 
 impl std::fmt::Display for Timestamp {
@@ -29,7 +29,7 @@ impl std::fmt::Display for Timestamp {
     }
 }
 
-fn config_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
+pub fn config_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
     if let Some(proj_dirs) = ProjectDirs::from("com", "v81d", "nope") {
         return Ok(proj_dirs.config_dir().to_owned());
     }
@@ -37,7 +37,7 @@ fn config_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
     Err("Failed to get project directory.".into())
 }
 
-fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
+pub fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     let config_path = Path::join(&config_dir().unwrap(), "config.toml");
 
     // Create all if the parent config directory is not present
