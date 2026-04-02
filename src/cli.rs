@@ -39,7 +39,7 @@ pub struct AddArgs {
 #[derive(Args)]
 pub struct RemoveArgs {
     /// Command ID to remove from regrets list
-    pub command_id: usize,
+    pub id: usize,
 }
 
 #[derive(Args)]
