@@ -3,10 +3,17 @@ name = "nope-cli"
 version = "0.1.0"
 edition = "2024"
 description = "A CLI tool for keeping track of commands you regret running."
+authors = ["v81d"]
 license = "GPL-3.0-or-later"
 repository = "https://github.com/v81d/nope"
 readme = "README.md"
 categories = ["command-line-utilities"]
+
+[package.metadata.wix]
+upgrade-guid = "58FF3431-5525-4C91-B13F-12460A37CEAE"
+path-guid = "55A8EAA7-387E-444B-99AB-DD138AD1AD38"
+license = false
+eula = false
 
 [[bin]]
 name = "nope"
@@ -21,3 +28,8 @@ serde = { version = "1.0.228", features = ["derive"] }
 strsim = "0.11.1"
 tabled = "0.20.0"
 toml = "1.1.1"
+
+# The profile that 'dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
