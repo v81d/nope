@@ -21,9 +21,13 @@
 - Warns you when you run a regretted command!
 - Multi-shell support (WIP).
 
+## Notice for PowerShell Users
+
+Due to some PowerShell limitations, some builtins like `cd`/`Set-Location` cannot be prevented using nope's `PreCommandLookupAction`. I've looked far and wide for solutions but it seems that this bug is really not a trivial problem. I will keep searching for fixes, but **Bash** and **Zsh** will, for now, be first-class in terms of support.
+
 ## Supported Shells
 
-At the moment, nope only supports **bash** and **zsh**, but support for more shells is being worked on!
+At the moment, nope only supports **Bash**, **Zsh**, and (experimentally) **PowerShell**, but support for more shells is being worked on!
 
 ## Quick Start
 
