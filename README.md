@@ -146,6 +146,12 @@ eval "$(nope init bash)"
 eval "$(nope init zsh)"
 ```
 
+3. For PowerShell, put this in your profile:
+
+```powershell
+Invoke-Expression (nope init powershell | Out-String)
+```
+
 ### Adding a Regret
 
 To add a new regret, type `nope add <COMMAND> <REASON>` with the command and reason in your terminal.
