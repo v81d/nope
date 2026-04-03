@@ -5,15 +5,13 @@ mod init;
 
 use checker::check_command;
 use clap::Parser;
-use cli::{Cli, Commands};
+use cli::{Cli, Commands, ConfigCommands};
 use colored::Colorize;
-use config::{Reason, Regret, Timestamp, add_regret, get_regret, list_regrets, remove_regret};
+use config::*;
 use init::initialize_shell;
 use std::io::{self, Write};
 use std::time::SystemTime;
 use tabled::{Table, Tabled, settings::Style};
-
-use crate::config::clear_regrets;
 
 #[derive(Tabled)]
 struct RegretListRow {
@@ -33,6 +31,12 @@ fn main() {
     let all_regrets = list_regrets().unwrap();
 
     match cli.command {
+        Commands::Config(config_args) => match config_args.command {
+            ConfigCommands::Threshold(threshold_args) => {
+                set_warning_threshold(threshold_args.value).unwrap();
+                println!("Warning threshold set to {}.", threshold_args.value);
+            }
+        },
         Commands::Init(args) => {
             initialize_shell(&args.shell);
         }

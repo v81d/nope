@@ -10,6 +10,8 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
+    /// Manage configuration
+    Config(ConfigArgs),
     /// Initialize the program for the specified shell
     Init(InitArgs),
     /// List existing regrets
@@ -22,6 +24,24 @@ pub enum Commands {
     Check(CheckArgs),
     /// Clear regrets list
     Clear,
+}
+
+#[derive(Args)]
+pub struct ConfigArgs {
+    #[command(subcommand)]
+    pub command: ConfigCommands,
+}
+
+#[derive(Subcommand)]
+pub enum ConfigCommands {
+    /// Set similarity threshold for detections
+    Threshold(ThresholdArgs),
+}
+
+#[derive(Args)]
+pub struct ThresholdArgs {
+    /// Threshold value between 0.0 and 1.0
+    pub value: f64,
 }
 
 #[derive(Args)]

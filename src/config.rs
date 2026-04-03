@@ -73,6 +73,34 @@ pub fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     Ok(config_path)
 }
 
+pub fn set_warning_threshold(threshold: f64) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+
+    let mut config: Config = if data.trim().is_empty() {
+        Config::default()
+    } else {
+        toml::from_str(&data).unwrap()
+    };
+
+    config.warning_threshold = threshold;
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+    file.set_len(0).unwrap();
+    file.write_all(toml::to_string(&config).unwrap().as_bytes())
+        .unwrap();
+
+    Ok(())
+}
+
 pub fn list_regrets() -> Result<Vec<Regret>, Box<dyn std::error::Error>> {
     let mut file = OpenOptions::new()
         .read(true)
