@@ -7,7 +7,11 @@ pub fn initialize_shell(shell: &str) {
     let raw_script = match shell {
         "bash" => include_str!("scripts/init.bash"),
         "zsh" => include_str!("scripts/init.zsh"),
-        _ => panic!("Unknown shell: {}. Supported: bash, zsh.", shell),
+        "powershell" => include_str!("scripts/init.powershell"),
+        _ => panic!(
+            "Unknown shell: {}. Supported: bash, zsh, powershell.",
+            shell
+        ),
     };
 
     let script = raw_script.replace("__EXE__", &exe);
