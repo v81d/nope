@@ -1,8 +1,27 @@
+$script:nopeLastLine = ""
+$script:nopeChecked = $false
+
+Set-PSReadLineKeyHandler -Key Enter -ScriptBlock {
+    $line = $null
+    $cursor = $null
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+
+    $script:nopeLastLine = $line
+    $script:nopeChecked = $false
+    [Microsoft.PowerShell.PSConsoleReadLine]::AcceptLine()
+}
+
 $ExecutionContext.InvokeCommand.PreCommandLookupAction = {
     param($commandName, $eventArgs)
 
+    if ($script:nopeChecked -or [string]::IsNullOrWhiteSpace($script:nopeLastLine)) {
+        return
+    }
+
+    $script:nopeChecked = $true
     $env:CLICOLOR_FORCE = "1"
-    $output = & "__EXE__" check $commandName 2>&1
+    $output = & "__EXE__" check $script:nopeLastLine 2>&1
+    $script:nopeLastLine = ""
 
     if ($LASTEXITCODE -ne 0) {
         foreach ($item in $output) {
@@ -10,6 +29,7 @@ $ExecutionContext.InvokeCommand.PreCommandLookupAction = {
         }
 
         $response = Read-Host "Run anyway? [y/N]"
+
         if ($response -notmatch '^[Yy]$') {
             $eventArgs.CommandScriptBlock = {}
         }
