@@ -174,6 +174,9 @@
         <!--<Property Id='ARPPRODUCTICON' Value='ProductICO' />-->
 
         <Property Id='ARPHELPLINK' Value='https://github.com/v81d/nope'/>
+
+        <Property Id="WIXUI_EXITDIALOGOPTIONALTEXT"
+          Value="nope was installed successfully, but you must attach a hook to your shell to allow it to intercept regretted commands. Visit https://github.com/v81d/nope to install the hook for your shell." />
         
         <UI>
             <UIRef Id='WixUI_FeatureTree'/>
