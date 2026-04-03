@@ -221,6 +221,7 @@ dependencies = [
  "directories",
  "humantime",
  "serde",
+ "strsim",
  "tabled",
  "toml",
 ]
