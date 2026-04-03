@@ -29,6 +29,7 @@
               pre-commit
               rustPackages.clippy
               rust-analyzer
+              cargo-dist
             ];
             RUST_SRC_PATH = rustPlatform.rustLibSrc;
           };
