@@ -112,9 +112,25 @@ fn main() {
             }
         }
         Commands::Check(args) => {
-            if let Some(regret) = check_command(&args.command) {
-                eprintln!("{}", "This command is in your regret list.".bold().red());
+            if let (Some(regret), Some(similarity_score)) = check_command(&args.command) {
+                eprintln!(
+                    "{}",
+                    "A similar command was found in your regrets list."
+                        .bold()
+                        .red()
+                );
+                eprintln!("{} {}", "Matched Command:".red(), regret.command.yellow());
                 eprintln!("{} {}", "Reason:".red(), regret.reason.get().yellow());
+                eprintln!(
+                    "{} {}",
+                    "Timestamp:".red(),
+                    regret.timestamp.to_string().yellow()
+                );
+                eprintln!(
+                    "{} {}",
+                    "Similarity Score:".red(),
+                    format!("{:.2}", similarity_score).yellow()
+                );
                 std::process::exit(1);
             }
         }

@@ -6,7 +6,17 @@ use std::path::{Path, PathBuf};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
+    pub warning_threshold: f64,
     pub regrets: Vec<Regret>,
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            warning_threshold: 0.75,
+            regrets: Vec::new(),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -22,7 +32,7 @@ pub struct Reason(pub Option<String>);
 
 impl Reason {
     pub fn get(&self) -> String {
-        self.0.clone().unwrap_or_default()
+        self.0.clone().unwrap_or("None".to_string())
     }
 }
 
@@ -76,9 +86,7 @@ pub fn list_regrets() -> Result<Vec<Regret>, Box<dyn std::error::Error>> {
     file.read_to_string(&mut data).unwrap();
 
     let config: Config = if data.trim().is_empty() {
-        Config {
-            regrets: Vec::new(),
-        }
+        Config::default()
     } else {
         toml::from_str(&data).unwrap()
     };
@@ -99,9 +107,7 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
     file.read_to_string(&mut data).unwrap(); // data as string
 
     let mut config: Config = if data.trim().is_empty() {
-        Config {
-            regrets: Vec::new(),
-        }
+        Config::default()
     } else {
         toml::from_str(&data).unwrap() // config as Vec<Regret>
     };
@@ -134,9 +140,7 @@ pub fn remove_regret(id: usize) -> Result<(), Box<dyn std::error::Error>> {
     file.read_to_string(&mut data).unwrap();
 
     let mut config: Config = if data.trim().is_empty() {
-        Config {
-            regrets: Vec::new(),
-        }
+        Config::default()
     } else {
         toml::from_str(&data).unwrap()
     };
@@ -160,14 +164,18 @@ pub fn clear_regrets() -> Result<(), Box<dyn std::error::Error>> {
         .open(get_config_path().unwrap())
         .unwrap();
 
-    let config = Config {
-        regrets: Vec::new(),
-    };
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
 
-    file.seek(SeekFrom::Start(0)).unwrap();
-    file.set_len(0).unwrap();
-    file.write_all(toml::to_string(&config).unwrap().as_bytes())
-        .unwrap();
+    if !data.trim().is_empty() {
+        let mut config: Config = toml::from_str(&data).unwrap();
+        config.regrets = Vec::new(); // reset regrets vector
+
+        file.seek(SeekFrom::Start(0)).unwrap();
+        file.set_len(0).unwrap();
+        file.write_all(toml::to_string(&config).unwrap().as_bytes())
+            .unwrap();
+    };
 
     Ok(())
 }
@@ -185,9 +193,7 @@ pub fn get_regret(id: usize) -> Result<Regret, Box<dyn std::error::Error>> {
     file.read_to_string(&mut data).unwrap();
 
     let config: Config = if data.trim().is_empty() {
-        Config {
-            regrets: Vec::new(),
-        }
+        Config::default()
     } else {
         toml::from_str(&data).unwrap()
     };
