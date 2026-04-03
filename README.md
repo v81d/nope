@@ -33,6 +33,16 @@ The following guide provides instructions on how to build and run nope.
 
 You must have Rust and Cargo installed. If you don't already have them, you can do so by following the [official install guide](https://rust-lang.org/tools/install).
 
+### Install from Crates.io
+
+To install the [nope-cli](https://crates.io/crates/nope-cli) package directly from [crates.io](https://crates.io), run:
+
+```bash
+cargo install nope-cli
+```
+
+That's all you need to do! This is, by far, the simplest installation method for those who want to use nope without much fuss!
+
 ### Nix Flake
 
 You can install nope using the official Nix flake. You can either do this declaratively (recommended for NixOS / Home Manager users) or imperatively.
