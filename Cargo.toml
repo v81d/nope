@@ -2,6 +2,11 @@
 name = "nope"
 version = "0.1.0"
 edition = "2024"
+description = "A CLI tool for keeping track of commands you regret running."
+license = "GPL-3.0-or-later"
+repository = "https://github.com/v81d/nope"
+readme = "README.md"
+categories = ["command-line-utilities"]
 
 [dependencies]
 clap = { version = "4.6.0", features = ["derive"] }
