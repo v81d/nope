@@ -1,27 +1,12 @@
 use strsim::normalized_levenshtein;
 
-use crate::config::{Config, Regret, get_config_path};
+use crate::config::{Regret, get_config, get_config_file, read_file};
 use std::collections::HashSet;
-use std::fs::OpenOptions;
-use std::io::Read;
 
 pub fn check_command(command: &str) -> (Option<Regret>, Option<f64>) {
-    let mut file = OpenOptions::new()
-        .read(true)
-        .write(true)
-        .create(true)
-        .truncate(false)
-        .open(get_config_path().unwrap())
-        .unwrap();
-
-    let mut data = String::new();
-    file.read_to_string(&mut data).unwrap();
-
-    let config: Config = if data.trim().is_empty() {
-        Config::default()
-    } else {
-        toml::from_str(&data).unwrap()
-    };
+    let mut file = get_config_file().unwrap();
+    let data = read_file(&mut file).unwrap();
+    let config = get_config(&data).unwrap();
 
     if !config.enabled {
         return (None, None);
