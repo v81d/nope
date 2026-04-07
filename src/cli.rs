@@ -34,6 +34,10 @@ pub struct ConfigArgs {
 
 #[derive(Subcommand)]
 pub enum ConfigCommands {
+    /// Enable command hook; show warning for detections
+    Enable,
+    /// Disable command hook; ignore detections
+    Disable,
     /// Set similarity threshold for detections
     Threshold(ThresholdArgs),
 }
