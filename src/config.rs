@@ -6,6 +6,7 @@ use std::path::{Path, PathBuf};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
+    pub enabled: bool,
     pub warning_threshold: f64,
     pub regrets: Vec<Regret>,
 }
@@ -13,6 +14,7 @@ pub struct Config {
 impl Default for Config {
     fn default() -> Self {
         Self {
+            enabled: true,
             warning_threshold: 0.75,
             regrets: Vec::new(),
         }
@@ -71,6 +73,34 @@ pub fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     }
 
     Ok(config_path)
+}
+
+pub fn set_enabled(enabled: bool) -> Result<(), Box<dyn std::error::Error>> {
+    let mut file = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .create(true)
+        .truncate(false)
+        .open(get_config_path().unwrap())
+        .unwrap();
+
+    let mut data = String::new();
+    file.read_to_string(&mut data).unwrap();
+
+    let mut config: Config = if data.trim().is_empty() {
+        Config::default()
+    } else {
+        toml::from_str(&data).unwrap()
+    };
+
+    config.enabled = enabled;
+
+    file.seek(SeekFrom::Start(0)).unwrap();
+    file.set_len(0).unwrap();
+    file.write_all(toml::to_string(&config).unwrap().as_bytes())
+        .unwrap();
+
+    Ok(())
 }
 
 pub fn set_warning_threshold(threshold: f64) -> Result<(), Box<dyn std::error::Error>> {

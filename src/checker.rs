@@ -23,6 +23,10 @@ pub fn check_command(command: &str) -> (Option<Regret>, Option<f64>) {
         toml::from_str(&data).unwrap()
     };
 
+    if !config.enabled {
+        return (None, None);
+    }
+
     let norm_input = normalize(command);
 
     let best_match = config
