@@ -87,8 +87,8 @@ home.packages = [
 
 To install nope imperatively, simply run the command:
 
-```nix
-nix profile install github:v81d/nope#nope
+```bash
+nix profile add "github:v81d/nope#nope"
 ```
 
 This will install all dependencies for the package and nope itself. After installation, you should be good to go.
