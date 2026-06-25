@@ -32,6 +32,14 @@ fn main() {
 
     match cli.command {
         Commands::Config(config_args) => match config_args.command {
+            ConfigCommands::Enable => {
+                set_enabled(true).unwrap();
+                println!("Checks are now enabled. Warnings will appear on scans.");
+            }
+            ConfigCommands::Disable => {
+                set_enabled(false).unwrap();
+                println!("Checks are now disabled. No warning will appear on scans.");
+            }
             ConfigCommands::Threshold(threshold_args) => {
                 set_warning_threshold(threshold_args.value).unwrap();
                 println!("Warning threshold set to {}.", threshold_args.value);
