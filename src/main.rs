@@ -9,7 +9,7 @@ use cli::{Cli, Commands, ConfigCommands};
 use colored::Colorize;
 use config::*;
 use init::initialize_shell;
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 use std::time::SystemTime;
 use tabled::{Table, Tabled, settings::Style};
 
@@ -23,6 +23,13 @@ struct RegretListRow {
     reason: String,
     #[tabled(rename = "Timestamp")]
     timestamp: String,
+}
+
+fn read_stdin_command() -> io::Result<String> {
+    let mut buffer = String::new();
+    let mut stdin = io::stdin();
+    stdin.read_to_string(&mut buffer)?;
+    Ok(buffer.trim_end_matches("\n").to_string())
 }
 
 fn main() {
@@ -124,7 +131,21 @@ fn main() {
             }
         }
         Commands::Check(args) => {
-            if let (Some(regret), Some(similarity_score)) = check_command(&args.command) {
+            let command: String = match args.command {
+                Some(c) => c, // if the user ran the command manually with the command to check as
+                // the input, we should still accept it assuming the user understands
+                // the risks
+                None => read_stdin_command() // for shell hooks: should read from stdin so the full
+                    // command (which might contain secrets) isn't leaked
+                    // to the process list
+                    .unwrap_or_else(|_| String::new()),
+            };
+
+            if command.is_empty() {
+                return;
+            }
+
+            if let (Some(regret), Some(similarity_score)) = check_command(&command) {
                 eprintln!(
                     "{}",
                     "A similar command was found in your regrets list."

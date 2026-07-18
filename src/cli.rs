@@ -71,5 +71,5 @@ pub struct RemoveArgs {
 #[derive(Args)]
 pub struct CheckArgs {
     /// Command to check against regrets list
-    pub command: String,
+    pub command: Option<String>,
 }
