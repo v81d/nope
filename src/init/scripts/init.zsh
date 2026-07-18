@@ -7,7 +7,9 @@ _nope_check() {
         return
     fi
 
-    if ! "__EXE__" check "$cmd"; then
+    nope check <<< "$cmd"
+
+    if [[ $? -ne 0 ]]; then
         local response
 
         read "response?Run anyway? [y/N] " </dev/tty
