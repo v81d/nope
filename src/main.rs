@@ -79,8 +79,34 @@ fn main() {
             };
             let id: usize = all_regrets.len();
 
+            println!(
+                "{}",
+                "WARNING: All commands in the regret list are stored in plaintext form. Do not add any sensitive information. Confirm that your command does not contain secrets."
+                    .bold()
+                    .red()
+            );
+
+            // ask user to verify that there are no secrets
+            // some users might not read the notice, so we should assume the command does contain
+            // secrets
+            print!("Does your command contain secrets? [Y/n] ");
+            io::stdout().flush().unwrap();
+
+            let mut confirmation = String::new();
+            io::stdin()
+                .read_line(&mut confirmation)
+                .expect("Failed to read user input.");
+
+            if confirmation.trim().eq_ignore_ascii_case("y") || confirmation.trim().is_empty() {
+                println!(
+                    "{}",
+                    "Cannot add this command because it contains secrets.".red()
+                );
+                return;
+            }
+
             // Regret details
-            println!("{}", format!("Regret {}:", id).bold().cyan());
+            println!("\n{}", format!("Regret {}:", id).bold().cyan());
             println!("{} {}", "Command:".cyan(), regret.command.yellow());
             println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
             println!(
@@ -171,7 +197,7 @@ fn main() {
             // Prompt
             println!(
                 "{}",
-                "WARNING: This is a highly destructive action!".bold().red()
+                "WARNING: This is a highly destructive action! Think before you type.".bold().red()
             );
             print!(
                 "Are you sure you want to clear {} {}? [y/N] ",
