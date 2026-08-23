@@ -5,6 +5,7 @@ use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(default)]
 pub struct Config {
     pub enabled: bool,
     pub warning_threshold: f64,
