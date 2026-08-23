@@ -87,8 +87,8 @@ fn main() {
             );
 
             // ask user to verify that there are no secrets
-            // some users might not read the notice, so we should assume the command does contain
-            // secrets
+            // some users might not read the notice, so we should assume the worst case (that is,
+            // the command DOES contain secrets)
             print!("Does your command contain secrets? [Y/n] ");
             io::stdout().flush().unwrap();
 
@@ -105,7 +105,7 @@ fn main() {
                 return;
             }
 
-            // Regret details
+            // show regret details
             println!("\n{}", format!("Regret {}:", id).bold().cyan());
             println!("{} {}", "Command:".cyan(), regret.command.yellow());
             println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
@@ -115,7 +115,7 @@ fn main() {
                 regret.timestamp.to_string().yellow()
             );
 
-            // Prompt
+            // confirm before adding the regret
             print!("Would you like to add this regret? [Y/n] ");
             io::stdout().flush().unwrap(); // force-write buffered output
 
@@ -132,7 +132,6 @@ fn main() {
         Commands::Remove(args) => {
             let regret: Regret = get_regret(args.id).unwrap();
 
-            // Regret details
             println!("{}", format!("Regret {}:", args.id).bold().cyan());
             println!("{} {}", "Command:".cyan(), regret.command.yellow());
             println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
@@ -142,7 +141,6 @@ fn main() {
                 regret.timestamp.to_string().yellow()
             );
 
-            // Prompt
             print!("Are you sure you want to remove this regret? [Y/n] ");
             io::stdout().flush().unwrap();
 
@@ -159,12 +157,12 @@ fn main() {
         Commands::Check(args) => {
             let command: String = match args.command {
                 Some(c) => c, // if the user ran the command manually with the command to check as
-                // the input, we should still accept it assuming the user understands
-                // the risks
-                None => read_stdin_command() // for shell hooks: should read from stdin so the full
-                    // command (which might contain secrets) isn't leaked
-                    // to the process list
-                    .unwrap_or_else(|_| String::new()),
+                // the input, we should still accept it assuming the user understands the risks
+                None => {
+                    read_stdin_command() // (for shell hooks) we should read from stdin so the full
+                        // command (which might contain secrets) doesn't get leaked to the process list
+                        .unwrap_or_else(|_| String::new())
+                }
             };
 
             if command.is_empty() {
@@ -194,10 +192,11 @@ fn main() {
             }
         }
         Commands::Clear => {
-            // Prompt
             println!(
                 "{}",
-                "WARNING: This is a highly destructive action! Think before you type.".bold().red()
+                "WARNING: This is a highly destructive action! Think before you type."
+                    .bold()
+                    .red()
             );
             print!(
                 "Are you sure you want to clear {} {}? [y/N] ",
