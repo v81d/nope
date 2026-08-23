@@ -5,6 +5,7 @@ use std::io::{Read, Seek, SeekFrom, Write};
 use std::path::{Path, PathBuf};
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(default)]
 pub struct Config {
     pub enabled: bool,
     pub warning_threshold: f64,
@@ -44,8 +45,9 @@ impl std::fmt::Display for Reason {
     }
 }
 
-/* Since std::time::SystemTime does not implement std::fmt::Display, create a new struct that
- * uses SystemTime as a field and implement display for that struct instead.
+/*
+ * Since std::time::SystemTime does not implement std::fmt::Display, we must create a new struct
+ * that uses SystemTime as a field and implement display for that struct instead.
  */
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Timestamp(pub std::time::SystemTime);
@@ -67,7 +69,7 @@ pub fn config_dir() -> Result<PathBuf, Box<dyn std::error::Error>> {
 pub fn get_config_path() -> Result<PathBuf, Box<dyn std::error::Error>> {
     let config_path = Path::join(&config_dir().unwrap(), "config.toml");
 
-    // Create all if the parent config directory is not present
+    // create the whole directory tree if the parent config directory is not present
     if let Some(parent) = config_path.parent() {
         std::fs::create_dir_all(parent).unwrap();
     }
@@ -141,14 +143,13 @@ pub fn add_regret(regret: Regret) -> Result<(), Box<dyn std::error::Error>> {
     let data = read_file(&mut file).unwrap();
     let mut config = get_config(&data).unwrap();
 
-    // If any regret in config has the same command as the one to be added, return an error
     if config.regrets.iter().any(|r| r.command == regret.command) {
         return Err("Regret already exists in configuration.".into());
     }
 
     config.regrets.push(regret);
 
-    file.seek(SeekFrom::Start(0)).unwrap(); // cursor to start
+    file.seek(SeekFrom::Start(0)).unwrap(); // seek writing cursor to start
     file.set_len(0).unwrap(); // truncate/clear
     file.write_all(toml::to_string(&config).unwrap().as_bytes())
         .unwrap();
@@ -161,7 +162,7 @@ pub fn remove_regret(id: usize) -> Result<(), Box<dyn std::error::Error>> {
     let data = read_file(&mut file).unwrap();
     let mut config = get_config(&data).unwrap();
 
-    config.regrets.remove(id); // remove at index
+    config.regrets.remove(id); // remove a regret from the regrets list at the given index
 
     file.seek(SeekFrom::Start(0)).unwrap();
     file.set_len(0).unwrap();
@@ -177,7 +178,7 @@ pub fn clear_regrets() -> Result<(), Box<dyn std::error::Error>> {
 
     if !data.trim().is_empty() {
         let mut config: Config = toml::from_str(&data).unwrap();
-        config.regrets = Vec::new(); // reset regrets vector
+        config.regrets = Vec::new(); // reset the regrets vector
 
         file.seek(SeekFrom::Start(0)).unwrap();
         file.set_len(0).unwrap();
