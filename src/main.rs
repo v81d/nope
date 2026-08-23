@@ -9,7 +9,7 @@ use cli::{Cli, Commands, ConfigCommands};
 use colored::Colorize;
 use config::*;
 use init::initialize_shell;
-use std::io::{self, Write};
+use std::io::{self, Read, Write};
 use std::time::SystemTime;
 use tabled::{Table, Tabled, settings::Style};
 
@@ -23,6 +23,13 @@ struct RegretListRow {
     reason: String,
     #[tabled(rename = "Timestamp")]
     timestamp: String,
+}
+
+fn read_stdin_command() -> io::Result<String> {
+    let mut buffer = String::new();
+    let mut stdin = io::stdin();
+    stdin.read_to_string(&mut buffer)?;
+    Ok(buffer.trim_end_matches("\n").to_string())
 }
 
 fn main() {
@@ -72,8 +79,34 @@ fn main() {
             };
             let id: usize = all_regrets.len();
 
-            // Regret details
-            println!("{}", format!("Regret {}:", id).bold().cyan());
+            println!(
+                "{}",
+                "WARNING: All commands in the regret list are stored in plaintext form. Do not add any sensitive information. Confirm that your command does not contain secrets."
+                    .bold()
+                    .red()
+            );
+
+            // ask user to verify that there are no secrets
+            // some users might not read the notice, so we should assume the worst case (that is,
+            // the command DOES contain secrets)
+            print!("Does your command contain secrets? [Y/n] ");
+            io::stdout().flush().unwrap();
+
+            let mut confirmation = String::new();
+            io::stdin()
+                .read_line(&mut confirmation)
+                .expect("Failed to read user input.");
+
+            if confirmation.trim().eq_ignore_ascii_case("y") || confirmation.trim().is_empty() {
+                println!(
+                    "{}",
+                    "Cannot add this command because it contains secrets.".red()
+                );
+                return;
+            }
+
+            // show regret details
+            println!("\n{}", format!("Regret {}:", id).bold().cyan());
             println!("{} {}", "Command:".cyan(), regret.command.yellow());
             println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
             println!(
@@ -82,7 +115,7 @@ fn main() {
                 regret.timestamp.to_string().yellow()
             );
 
-            // Prompt
+            // confirm before adding the regret
             print!("Would you like to add this regret? [Y/n] ");
             io::stdout().flush().unwrap(); // force-write buffered output
 
@@ -99,7 +132,6 @@ fn main() {
         Commands::Remove(args) => {
             let regret: Regret = get_regret(args.id).unwrap();
 
-            // Regret details
             println!("{}", format!("Regret {}:", args.id).bold().cyan());
             println!("{} {}", "Command:".cyan(), regret.command.yellow());
             println!("{} {}", "Reason:".cyan(), regret.reason.get().yellow());
@@ -109,7 +141,6 @@ fn main() {
                 regret.timestamp.to_string().yellow()
             );
 
-            // Prompt
             print!("Are you sure you want to remove this regret? [Y/n] ");
             io::stdout().flush().unwrap();
 
@@ -124,7 +155,21 @@ fn main() {
             }
         }
         Commands::Check(args) => {
-            if let (Some(regret), Some(similarity_score)) = check_command(&args.command) {
+            let command: String = match args.command {
+                Some(c) => c, // if the user ran the command manually with the command to check as
+                // the input, we should still accept it assuming the user understands the risks
+                None => {
+                    read_stdin_command() // (for shell hooks) we should read from stdin so the full
+                        // command (which might contain secrets) doesn't get leaked to the process list
+                        .unwrap_or_else(|_| String::new())
+                }
+            };
+
+            if command.is_empty() {
+                return;
+            }
+
+            if let (Some(regret), Some(similarity_score)) = check_command(&command) {
                 eprintln!(
                     "{}",
                     "A similar command was found in your regrets list."
@@ -147,10 +192,11 @@ fn main() {
             }
         }
         Commands::Clear => {
-            // Prompt
             println!(
                 "{}",
-                "WARNING: This is a highly destructive action!".bold().red()
+                "WARNING: This is a highly destructive action! Think before you type."
+                    .bold()
+                    .red()
             );
             print!(
                 "Are you sure you want to clear {} {}? [y/N] ",

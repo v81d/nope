@@ -1,6 +1,6 @@
 use clap::{Args, Parser, Subcommand};
 
-/// A CLI tool for keeping track of commands you regret running
+/// A CLI tool for keeping track of commands you regret running.
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 pub struct Cli {
@@ -10,9 +10,9 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Commands {
-    /// Manage configuration
+    /// Configure detection settings
     Config(ConfigArgs),
-    /// Initialize the program for the specified shell
+    /// Initialize the program for a given shell
     Init(InitArgs),
     /// List existing regrets
     List,
@@ -22,7 +22,7 @@ pub enum Commands {
     Remove(RemoveArgs),
     /// Check a command against existing regrets
     Check(CheckArgs),
-    /// Clear regrets list
+    /// Clear the regrets list
     Clear,
 }
 
@@ -34,42 +34,42 @@ pub struct ConfigArgs {
 
 #[derive(Subcommand)]
 pub enum ConfigCommands {
-    /// Enable command hook; show warning for detections
+    /// Enable the command hook and show an alert for detections
     Enable,
-    /// Disable command hook; ignore detections
+    /// Disable the command hook and ignore detections
     Disable,
-    /// Set similarity threshold for detections
+    /// Set the similarity threshold for detections (between 0 and 1)
     Threshold(ThresholdArgs),
 }
 
 #[derive(Args)]
 pub struct ThresholdArgs {
-    /// Threshold value between 0.0 and 1.0
+    /// The similarity threshold above which an input should trigger an alert.
     pub value: f64,
 }
 
 #[derive(Args)]
 pub struct InitArgs {
-    /// The shell to initialize
+    /// The shell to initialize the program for
     pub shell: String,
 }
 
 #[derive(Args)]
 pub struct AddArgs {
-    /// Command to add to regrets list
+    /// The command to add to regrets list
     pub command: String,
-    /// Brief reason for regret
+    /// The reason for the regret
     pub reason: Option<String>,
 }
 
 #[derive(Args)]
 pub struct RemoveArgs {
-    /// Command ID to remove from regrets list
+    /// The command ID to remove from the regrets list
     pub id: usize,
 }
 
 #[derive(Args)]
 pub struct CheckArgs {
-    /// Command to check against regrets list
-    pub command: String,
+    /// The command to check against the regrets list
+    pub command: Option<String>,
 }
